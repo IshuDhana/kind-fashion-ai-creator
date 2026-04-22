@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K.I.N.D. — AI Fashion Content Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #FAFAF8; --white: #FFFFFF; --ink: #1A1A1A; --muted: #6B6B6B;
+  --border: #E8E4DE; --border-dark: #D0C8BC;
+  --arket: #C4956A; --arket-light: #FDF4EC;
+  --cos: #6B8FAB; --cos-light: #EEF4F9;
+  --mango: #C4697A; --mango-light: #FDF0F2;
+  --green: #4A8C6A; --green-light: #EAF4EE;
+  --red: #C44A4A; --red-light: #FDF0F0;
+  --pill-r: 100px; --card-r: 16px;
+}
+html { font-size: 17px; scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 400; min-height: 100vh; overflow-x: hidden; }
+
+.shell { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar { background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar-logo { padding: 32px 28px 24px; border-bottom: 1px solid var(--border); }
+.logo-mark { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.logo-dot { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #C4956A 0%, #C4697A 100%); flex-shrink: 0; }
+.logo-word { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: 0.04em; color: var(--ink); }
+.logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.sidebar-section { padding: 22px 28px; border-bottom: 1px solid var(--border); }
+.sidebar-label { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: block; }
+.client-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 14px; border-radius: 10px; background: none; border: 1.5px solid transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; text-align: left; transition: all 0.2s; margin-bottom: 4px; }
+.client-btn:hover { background: var(--bg); color: var(--ink); }
+.client-btn.active-arket { background: var(--arket-light); border-color: var(--arket); color: var(--ink); }
+.client-btn.active-cos { background: var(--cos-light); border-color: var(--cos); color: var(--ink); }
+.client-btn.active-mango { background: var(--mango-light); border-color: var(--mango); color: var(--ink); }
+.client-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; flex-shrink: 0; color: #fff; }
+.av-arket { background: var(--arket); } .av-cos { background: var(--cos); } .av-mango { background: var(--mango); }
+.client-name { font-weight: 500; font-size: 14px; }
+.client-docs { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.kb-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+.kb-row:last-child { border-bottom: none; }
+.kb-chip { font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: 500; flex-shrink: 0; }
+.chip-brand { background: #FDF4EC; color: var(--arket); }
+.chip-market { background: var(--green-light); color: var(--green); }
+.status-area { margin-top: auto; padding: 18px 28px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; transition: all 0.3s; }
+.live-dot.connected { background: var(--green); box-shadow: 0 0 0 3px var(--green-light); }
+.live-dot.error { background: var(--red); }
+
+/* MAIN */
+.main { display: flex; flex-direction: column; min-height: 100vh; }
+.topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.topbar-left h1 { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; color: var(--ink); }
+.topbar-left p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.topbar-right { display: flex; gap: 10px; align-items: center; }
+
+.btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: var(--pill-r); cursor: pointer; border: 1.5px solid var(--border); background: transparent; color: var(--muted); transition: all 0.2s; white-space: nowrap; }
+.btn:hover { border-color: var(--ink); color: var(--ink); background: var(--bg); }
+.btn-primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+.btn-primary:hover { background: #333; color: #fff; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* PIPELINE */
+.pipeline-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 40px; display: flex; overflow-x: auto; }
+.pipe-step { padding: 13px 0; margin-right: 34px; font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--border-dark); position: relative; white-space: nowrap; transition: color 0.3s; }
+.pipe-step::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--arket), var(--mango)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+.pipe-step.done { color: var(--muted); }
+.pipe-step.active { color: var(--ink); }
+.pipe-step.active::after { transform: scaleX(1); }
+
+/* CONTENT */
+.content { padding: 28px 40px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+
+/* HERO */
+.hero { background: linear-gradient(135deg, #1A1A1A 0%, #2D1F2D 55%, #1A2D2A 100%); border-radius: var(--card-r); padding: 44px 52px; position: relative; overflow: hidden; color: #fff; }
+.hero-bg-text { position: absolute; right: -30px; top: -30px; font-family: 'Playfair Display', serif; font-size: 180px; font-weight: 700; font-style: italic; color: rgba(255,255,255,0.04); line-height: 1; pointer-events: none; user-select: none; }
+.hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--pill-r); padding: 6px 16px; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 20px; }
+.hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, #C4956A, #C4697A); }
+.hero h2 { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; font-style: italic; line-height: 1.1; color: #fff; margin-bottom: 14px; max-width: 560px; }
+.hero p { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.5); max-width: 500px; margin-bottom: 32px; }
+.hero-stats { display: flex; }
+.hero-stat { padding: 18px 30px; border-right: 1px solid rgba(255,255,255,0.1); }
+.hero-stat:first-child { padding-left: 0; }
+.hero-stat:last-child { border-right: none; }
+.hero-stat-num { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; color: #fff; line-height: 1; }
+.hero-stat-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 5px; }
+.hero-dots { position: absolute; right: 52px; bottom: 44px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+.hero-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.1); }
+
+/* SAMPLE BANNER */
+.sample-banner { background: linear-gradient(135deg, #FDF4EC 0%, #FEF0F4 100%); border: 1.5px solid #EDD8C8; border-radius: var(--card-r); padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.sample-banner-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.sample-banner-sub { font-size: 13px; color: var(--muted); }
+.sample-examples { display: flex; gap: 8px; flex-wrap: wrap; }
+.sample-chip { padding: 8px 18px; border-radius: var(--pill-r); font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid; transition: all 0.18s; background: #fff; }
+.sc-arket { border-color: var(--arket); color: var(--arket); } .sc-arket:hover { background: var(--arket); color: #fff; }
+.sc-cos { border-color: var(--cos); color: var(--cos); } .sc-cos:hover { background: var(--cos); color: #fff; }
+.sc-mango { border-color: var(--mango); color: var(--mango); } .sc-mango:hover { background: var(--mango); color: #fff; }
+
+/* CARDS */
+.card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--card-r); overflow: hidden; }
+.card-full { width: 100%; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.card-head { padding: 16px 24px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.card-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.card-badge { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: var(--pill-r); }
+.badge-brand { background: var(--arket-light); color: var(--arket); }
+.badge-market { background: var(--green-light); color: var(--green); }
+.badge-client { background: var(--bg); color: var(--ink); border: 1px solid var(--border); }
+.badge-ready { background: var(--green-light); color: var(--green); }
+.card-body { padding: 22px 24px; }
+
+/* FORM */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-label { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.form-select { appearance: none; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); cursor: pointer; transition: border-color 0.2s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+.form-select:focus { outline: none; border-color: var(--ink); }
+
+/* MOOD */
+.mood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 4px; }
+.mood-opt { padding: 11px 8px; border: 1.5px solid var(--border); border-radius: 10px; text-align: center; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.18s; background: var(--bg); }
+.mood-opt:hover { border-color: var(--ink); color: var(--ink); }
+.mood-opt.sel-minimal { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
+.mood-opt.sel-editorial { background: var(--cos); color: #fff; border-color: var(--cos); }
+.mood-opt.sel-campaign { background: var(--mango); color: #fff; border-color: var(--mango); }
+.mood-opt.sel-ecom_clean { background: var(--arket); color: #fff; border-color: var(--arket); }
+
+/* PROMPT PREVIEW */
+.prompt-preview { background: #F8F6FF; border: 1.5px solid #E0D8FF; border-radius: 10px; padding: 16px 18px; font-size: 13px; line-height: 1.7; color: #5A5080; margin-top: 18px; }
+.pp-label { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #9080C0; margin-bottom: 6px; display: block; }
+.pp-hl { color: #6040B0; font-weight: 500; }
+
+/* OUTPUT */
+.output-placeholder { min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.output-placeholder-glyph { font-family: 'Playfair Display', serif; font-size: 56px; font-style: italic; font-weight: 700; background: linear-gradient(135deg, var(--arket), var(--mango)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; opacity: 0.3; }
+.output-placeholder-text { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--border-dark); }
+.output-content { display: none; animation: fadeUp 0.5s ease; }
+.output-content.visible { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.output-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.output-tag { font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: var(--pill-r); background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+.output-tag-client-arket { background: var(--arket-light); color: var(--arket); border-color: var(--arket-light); }
+.output-tag-client-cos { background: var(--cos-light); color: var(--cos); border-color: var(--cos-light); }
+.output-tag-client-mango { background: var(--mango-light); color: var(--mango); border-color: var(--mango-light); }
+.output-text { font-size: 15px; line-height: 1.85; color: var(--ink); }
+.output-text h1 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; font-style: italic; margin: 0 0 16px; }
+.output-text h2 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin: 20px 0 8px; letter-spacing: 0.04em; }
+.output-text h3 { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; margin: 16px 0 6px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.output-text strong { font-weight: 600; }
+.output-text hr { border: none; border-top: 1.5px solid var(--border); margin: 18px 0; }
+.output-actions { display: flex; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1.5px solid var(--border); flex-wrap: wrap; }
+
+/* COMPARE */
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 18px; }
+.compare-header { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 7px 14px; border-radius: 8px; display: inline-block; margin-bottom: 10px; }
+.ch-generic { background: var(--red-light); color: var(--red); }
+.ch-kind { background: var(--green-light); color: var(--green); }
+.compare-text { font-size: 13px; line-height: 1.8; color: var(--ink); background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 16px; min-height: 160px; white-space: pre-wrap; }
+.diff-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.diff-item { background: var(--green-light); border: 1px solid #C8E8D4; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--green); display: flex; gap: 8px; align-items: flex-start; }
+
+/* KB */
+.kb-item { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); align-items: center; }
+.kb-item:last-child { border-bottom: none; }
+.kb-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+.ki-brand { background: var(--arket-light); color: var(--arket); }
+.ki-market { background: var(--green-light); color: var(--green); }
+.ki-cos { background: var(--cos-light); color: var(--cos); }
+.kb-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+.kb-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ITERATE */
+.iterate-textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); resize: vertical; min-height: 90px; margin-bottom: 12px; transition: border-color 0.2s; }
+.iterate-textarea:focus { outline: none; border-color: var(--ink); }
+.iterate-textarea::placeholder { color: var(--border-dark); }
+
+/* LOADING */
+.loading-overlay { display: none; position: absolute; inset: 0; background: rgba(250,250,248,0.92); backdrop-filter: blur(4px); align-items: center; justify-content: center; flex-direction: column; gap: 14px; z-index: 10; border-radius: var(--card-r); }
+.loading-overlay.active { display: flex; }
+.loading-ring { width: 38px; height: 38px; border: 2.5px solid var(--border); border-top-color: var(--ink); border-right-color: var(--mango); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-msg { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.loading-bar { width: 140px; height: 3px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.loading-bar-fill { height: 100%; background: linear-gradient(90deg, var(--arket), var(--mango)); border-radius: 3px; transition: width 0.4s ease; width: 0%; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--ink); color: #fff; padding: 12px 24px; border-radius: var(--pill-r); font-size: 13px; font-weight: 500; z-index: 9999; opacity: 0; transition: all 0.3s ease; white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.fade-in { animation: fadeUp 0.5s ease both; }
+.d1 { animation-delay: 0.05s; } .d2 { animation-delay: 0.1s; } .d3 { animation-delay: 0.15s; } .d4 { animation-delay: 0.2s; } .d5 { animation-delay: 0.25s; }
+::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-dot"></div>
+        <span class="logo-word">K.I.N.D.</span>
+      </div>
+      <div class="logo-sub">AI Fashion Content Studio</div>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Active Client</span>
+      <button class="client-btn active-arket" id="btn-arket" onclick="setClient('arket',this)">
+        <div class="client-avatar av-arket">A</div>
+        <div><div class="client-name">Arket</div><div class="client-docs">4 brand docs · minimal</div></div>
+      </button>
+      <button class="client-btn" id="btn-cos" onclick="setClient('cos',this)">
+        <div class="client-avatar av-cos">C</div>
+        <div><div class="client-name">COS</div><div class="client-docs">2 brand docs · architectural</div></div>
+      </button>
+      <button class="client-btn" id="btn-mango" onclick="setClient('mango',this)">
+        <div class="client-avatar av-mango">M</div>
+        <div><div class="client-name">Mango</div><div class="client-docs">2 brand docs · campaign</div></div>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Primary KB</span>
+      <div class="kb-row"><span class="kb-chip chip-brand">Brand</span> brand_guidelines.md</div>
+      <div class="kb-row"><span class="kb-chip chip-brand">Brand</span> shoot_direction.md</div>
+      <div class="kb-row"><span class="kb-chip chip-brand">Brand</span> product_specs.md</div>
+      <div class="kb-row"><span class="kb-chip chip-brand">Brand</span> past_content/</div>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Secondary Layer</span>
+      <div class="kb-row"><span class="kb-chip chip-market">Market</span> market_trends.md</div>
+      <div class="kb-row"><span class="kb-chip chip-market">Market</span> competitor_analysis.md</div>
+      <div class="kb-row"><span class="kb-chip chip-market">Market</span> ecommerce_benchmarks.md</div>
+    </div>
+
+    <div class="status-area">
+      <div class="live-dot" id="api-dot"></div>
+      <span id="api-status">Checking API...</span>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>AI Fashion Content Creator</h1>
+        <p id="topbar-sub">K.I.N.D. Studio · Hamburg · Select a client and generate</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn" id="compare-btn" style="display:none" onclick="showCompare()">Compare vs ChatGPT</button>
+        <button class="btn btn-primary" id="gen-btn" onclick="generate()">Generate Content</button>
+      </div>
+    </div>
+
+    <div class="pipeline-bar">
+      <div class="pipe-step active" id="pipe-document">01 · Document</div>
+      <div class="pipe-step" id="pipe-monitor">02 · Monitor</div>
+      <div class="pipe-step" id="pipe-brief">03 · Brief</div>
+      <div class="pipe-step" id="pipe-publish">04 · Publish</div>
+      <div class="pipe-step" id="pipe-iterate">05 · Iterate</div>
+    </div>
+
+    <div class="content">
+
+      <!-- HERO -->
+      <div class="hero fade-in d1">
+        <div class="hero-bg-text">KIND</div>
+        <div class="hero-tag"><span class="hero-tag-dot"></span>AI-First Fashion Content Production</div>
+        <h2>Content that knows<br>the brand.</h2>
+        <p>Two knowledge bases. Advanced prompt engineering. Brand-aligned outputs demonstrably distinct from generic AI — for Arket, COS, and Mango.</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">Clients</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">7</div><div class="hero-stat-label">KB Docs</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">5</div><div class="hero-stat-label">Formats</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">5</div><div class="hero-stat-label">Pipeline Stages</div></div>
+        </div>
+        <div class="hero-dots">
+          <div class="hero-dot"></div><div class="hero-dot"></div><div class="hero-dot"></div><div class="hero-dot"></div><div class="hero-dot"></div>
+          <div class="hero-dot"></div><div class="hero-dot"></div><div class="hero-dot"></div><div class="hero-dot"></div><div class="hero-dot"></div>
+          <div class="hero-dot"></div><div class="hero-dot"></div><div class="hero-dot"></div><div class="hero-dot"></div><div class="hero-dot"></div>
+        </div>
+      </div>
+
+      <!-- SAMPLE BANNER -->
+      <div class="sample-banner fade-in d2">
+        <div>
+          <div class="sample-banner-title">✦ Try an example — load & generate instantly</div>
+          <div class="sample-banner-sub">Click any sample to auto-configure and generate a real API result</div>
+        </div>
+        <div class="sample-examples">
+          <button class="sample-chip sc-arket" onclick="loadSample('arket','shoot_direction','outerwear','minimal')">Arket · Shoot Direction</button>
+          <button class="sample-chip sc-cos" onclick="loadSample('cos','art_direction_brief','tailoring','editorial')">COS · Art Direction</button>
+          <button class="sample-chip sc-mango" onclick="loadSample('mango','social_caption','outerwear','campaign')">Mango · Social Caption</button>
+          <button class="sample-chip sc-arket" onclick="loadSample('arket','pdp_copy','knitwear','minimal')">Arket · PDP Copy</button>
+        </div>
+      </div>
+
+      <!-- GENERATOR -->
+      <div class="card card-full fade-in d3" style="position:relative">
+        <div class="card-head">
+          <span class="card-title">Content Generator</span>
+          <span class="card-badge badge-client" id="client-badge">Arket</span>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Content Format</label>
+              <select class="form-select" id="format-select" onchange="updatePreview()">
+                <option value="shoot_direction">Shoot Direction Memo</option>
+                <option value="pdp_copy">PDP Copy</option>
+                <option value="art_direction_brief">Art Direction Brief</option>
+                <option value="lookbook_brief">Lookbook Brief</option>
+                <option value="social_caption">Social Caption</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Product Category</label>
+              <select class="form-select" id="category-select" onchange="updatePreview()">
+                <option value="outerwear">Outerwear</option>
+                <option value="knitwear">Knitwear</option>
+                <option value="tailoring">Tailoring</option>
+                <option value="denim">Denim</option>
+                <option value="accessories">Accessories</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Visual Mood</label>
+            <div class="mood-grid">
+              <div class="mood-opt sel-minimal" id="mood-minimal" onclick="setMood('minimal',this)">Minimal</div>
+              <div class="mood-opt" id="mood-editorial" onclick="setMood('editorial',this)">Editorial</div>
+              <div class="mood-opt" id="mood-campaign" onclick="setMood('campaign',this)">Campaign</div>
+              <div class="mood-opt" id="mood-ecom_clean" onclick="setMood('ecom_clean',this)">E-com Clean</div>
+            </div>
+          </div>
+          <div class="prompt-preview">
+            <span class="pp-label">Live Prompt Preview</span>
+            You are a senior creative at K.I.N.D. Using
+            <span class="pp-hl">[brand_guidelines.md]</span> + <span class="pp-hl">[shoot_direction.md]</span> → PRIMARY KB ·
+            <span class="pp-hl">[market_trends.md]</span> + <span class="pp-hl">[competitor_analysis.md]</span> → SECONDARY KB ·
+            Generate <span class="pp-hl" id="pp-format">shoot_direction</span> for
+            <span class="pp-hl" id="pp-client">Arket</span> <span class="pp-hl" id="pp-cat">outerwear</span>.
+            Mood: <span class="pp-hl" id="pp-mood">minimal</span>.
+            Avoid generic fashion language. Ground every output in documented brand aesthetic.
+          </div>
+        </div>
+        <div class="loading-overlay" id="gen-loading">
+          <div class="loading-ring"></div>
+          <div class="loading-msg" id="gen-stage">Loading knowledge base...</div>
+          <div class="loading-bar"><div class="loading-bar-fill" id="gen-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- OUTPUT -->
+      <div class="card card-full fade-in d4" style="position:relative">
+        <div class="card-head">
+          <span class="card-title">Generated Output</span>
+          <span class="card-badge badge-ready" id="output-badge" style="display:none">Ready</span>
+        </div>
+        <div class="card-body" style="position:relative; min-height:260px">
+          <div class="output-placeholder" id="out-placeholder">
+            <div class="output-placeholder-glyph">✦</div>
+            <div class="output-placeholder-text">Awaiting generation</div>
+          </div>
+          <div class="output-content" id="out-content">
+            <div class="output-tags" id="out-tags"></div>
+            <div class="output-text" id="out-text"></div>
+            <div class="output-actions">
+              <button class="btn btn-primary" onclick="copyOutput()">Copy Output</button>
+              <button class="btn" onclick="toggleIterate()">Iterate with Feedback</button>
+              <button class="btn" onclick="showCompare()">Compare vs ChatGPT</button>
+            </div>
+          </div>
+          <div class="loading-overlay" id="out-loading">
+            <div class="loading-ring"></div>
+            <div class="loading-msg" id="out-stage">Generating...</div>
+            <div class="loading-bar"><div class="loading-bar-fill" id="out-fill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ITERATE -->
+      <div class="card card-full fade-in" id="iterate-card" style="display:none">
+        <div class="card-head">
+          <span class="card-title">05 · Iterate — Refine Output</span>
+          <span class="card-badge badge-market">Stage 5</span>
+        </div>
+        <div class="card-body">
+          <textarea class="iterate-textarea" id="iter-input" placeholder="e.g. Make the tone more restrained. Be more specific about lighting angle. Remove seasonal references..."></textarea>
+          <button class="btn btn-primary" onclick="iterate()">Apply Feedback & Regenerate</button>
+        </div>
+      </div>
+
+      <!-- COMPARE -->
+      <div class="card card-full fade-in" id="compare-card" style="display:none; position:relative">
+        <div class="card-head">
+          <span class="card-title">Uniqueness Evidence — K.I.N.D. vs Generic ChatGPT</span>
+          <span class="card-badge badge-ready">Side by Side</span>
+        </div>
+        <div class="card-body" style="position:relative">
+          <div class="compare-grid">
+            <div>
+              <span class="compare-header ch-generic">Generic ChatGPT</span>
+              <div class="compare-text" id="cmp-generic">Generating...</div>
+            </div>
+            <div>
+              <span class="compare-header ch-kind">K.I.N.D. Brand-Aligned</span>
+              <div class="compare-text" id="cmp-kind"></div>
+            </div>
+          </div>
+          <div class="diff-list" id="diff-list"></div>
+          <div class="loading-overlay" id="cmp-loading">
+            <div class="loading-ring"></div>
+            <div class="loading-msg">Generating comparison...</div>
+            <div class="loading-bar"><div class="loading-bar-fill" style="width:65%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KB CARDS -->
+      <div class="two-col">
+        <div class="card fade-in d5">
+          <div class="card-head">
+            <span class="card-title">Primary Knowledge Base</span>
+            <span class="card-badge badge-brand">Brand</span>
+          </div>
+          <div class="card-body">
+            <div class="kb-item"><div class="kb-icon ki-brand">B</div><div><div class="kb-name">brand_guidelines.md</div><div class="kb-desc">Voice · Aesthetic · Banned words</div></div></div>
+            <div class="kb-item"><div class="kb-icon ki-brand">S</div><div><div class="kb-name">shoot_direction.md</div><div class="kb-desc">Lighting · Pose logic · Backgrounds</div></div></div>
+            <div class="kb-item"><div class="kb-icon ki-brand">C</div><div><div class="kb-name">past_content/</div><div class="kb-desc">Top PDPs · Lookbooks · Performance</div></div></div>
+            <div class="kb-item"><div class="kb-icon ki-brand">P</div><div><div class="kb-name">product_specs.md</div><div class="kb-desc">Silhouettes · Materials · Standards</div></div></div>
+          </div>
+        </div>
+        <div class="card fade-in d5">
+          <div class="card-head">
+            <span class="card-title">Secondary Research Layer</span>
+            <span class="card-badge badge-market">Market</span>
+          </div>
+          <div class="card-body">
+            <div class="kb-item"><div class="kb-icon ki-market">T</div><div><div class="kb-name">market_trends.md</div><div class="kb-desc">WGSN · Lyst Index · Season signals</div></div></div>
+            <div class="kb-item"><div class="kb-icon ki-cos">C</div><div><div class="kb-name">competitor_analysis.md</div><div class="kb-desc">Zara · &Other Stories · Massimo Dutti</div></div></div>
+            <div class="kb-item"><div class="kb-icon ki-market">E</div><div><div class="kb-name">ecommerce_benchmarks.md</div><div class="kb-desc">CTR · Conversion · Return drivers</div></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:8000';
+let client = 'arket', mood = 'minimal', lastOutput = '', lastFormat = 'shoot_direction', lastCategory = 'outerwear';
+const NAMES = { arket:'Arket', cos:'COS', mango:'Mango' };
+const MOOD_CLS = { minimal:'sel-minimal', editorial:'sel-editorial', campaign:'sel-campaign', ecom_clean:'sel-ecom_clean' };
+
+async function checkAPI() {
+  try {
+    const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(3000) });
+    const dot = document.getElementById('api-dot');
+    if (r.ok) { dot.className = 'live-dot connected'; document.getElementById('api-status').textContent = 'API connected · Ready'; }
+    else throw new Error();
+  } catch { document.getElementById('api-dot').className = 'live-dot error'; document.getElementById('api-status').textContent = 'API offline — start server'; }
+}
+checkAPI(); setInterval(checkAPI, 12000);
+
+function loadSample(c, fmt, cat, m) {
+  client = c;
+  document.querySelectorAll('.client-btn').forEach(b => b.className = 'client-btn');
+  document.getElementById('btn-' + c).classList.add('active-' + c);
+  document.getElementById('client-badge').textContent = NAMES[c];
+  document.getElementById('topbar-sub').textContent = `K.I.N.D. Studio · Hamburg · Client: ${NAMES[c]}`;
+  document.getElementById('format-select').value = fmt;
+  document.getElementById('category-select').value = cat;
+  mood = m;
+  document.querySelectorAll('.mood-opt').forEach(el => el.className = 'mood-opt');
+  const mel = document.getElementById('mood-' + m);
+  if (mel) mel.classList.add(MOOD_CLS[m]);
+  updatePreview();
+  showToast(`Sample loaded: ${NAMES[c]} · ${fmt.replace(/_/g,' ')}`);
+  setTimeout(() => generate(), 350);
+}
+
+function setClient(c, btn) {
+  client = c;
+  document.querySelectorAll('.client-btn').forEach(b => b.className = 'client-btn');
+  btn.classList.add('active-' + c);
+  document.getElementById('client-badge').textContent = NAMES[c];
+  document.getElementById('topbar-sub').textContent = `K.I.N.D. Studio · Hamburg · Client: ${NAMES[c]}`;
+  updatePreview(); resetOutput();
+}
+
+function setMood(m, el) {
+  mood = m;
+  document.querySelectorAll('.mood-opt').forEach(o => o.className = 'mood-opt');
+  el.classList.add(MOOD_CLS[m]);
+  updatePreview();
+}
+
+function updatePreview() {
+  const fmt = document.getElementById('format-select').value;
+  const cat = document.getElementById('category-select').value;
+  document.getElementById('pp-format').textContent = fmt;
+  document.getElementById('pp-client').textContent = NAMES[client];
+  document.getElementById('pp-cat').textContent = cat;
+  document.getElementById('pp-mood').textContent = mood;
+}
+
+function setPipe(stage) {
+  const order = ['document','monitor','brief','publish','iterate'];
+  const idx = order.indexOf(stage);
+  order.forEach((s, i) => {
+    const el = document.getElementById('pipe-' + s);
+    el.className = 'pipe-step';
+    if (i < idx) el.classList.add('done');
+    else if (i === idx) el.classList.add('active');
+  });
+}
+
+async function generate() {
+  const fmt = document.getElementById('format-select').value;
+  const cat = document.getElementById('category-select').value;
+  lastFormat = fmt; lastCategory = cat;
+  resetOutput();
+  document.getElementById('out-loading').classList.add('active');
+  document.getElementById('out-placeholder').style.display = 'none';
+  document.getElementById('gen-btn').disabled = true;
+
+  const stages = [
+    { pct:20, msg:'Loading primary knowledge base...', pipe:'document' },
+    { pct:42, msg:'Cross-referencing market research...', pipe:'monitor' },
+    { pct:62, msg:'Building brand-aware prompt...', pipe:'brief' },
+    { pct:82, msg:'Generating with Claude AI...', pipe:'publish' },
+    { pct:96, msg:'Applying brand voice filter...', pipe:'publish' },
+  ];
+  let si = 0;
+  const iv = setInterval(() => {
+    if (si >= stages.length) { clearInterval(iv); return; }
+    document.getElementById('out-fill').style.width = stages[si].pct + '%';
+    document.getElementById('out-stage').textContent = stages[si].msg;
+    setPipe(stages[si].pipe);
+    si++;
+  }, 600);
+
+  try {
+    const res = await fetch(`${API}/generate`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ client, content_format: fmt, category: cat, mood }) });
+    clearInterval(iv);
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    lastOutput = data.content;
+    renderOutput(data, fmt, cat);
+    setPipe('publish');
+    showToast('Content generated ✓');
+  } catch (err) {
+    clearInterval(iv);
+    document.getElementById('out-loading').classList.remove('active');
+    document.getElementById('out-placeholder').style.display = 'flex';
+    document.getElementById('out-placeholder').innerHTML = `<div class="output-placeholder-glyph" style="opacity:0.4">✗</div><div class="output-placeholder-text" style="color:var(--red)">${err.message}</div><div style="font-size:12px;color:var(--muted);margin-top:6px;font-family:sans-serif">Is the server running? → python api.py</div>`;
+    showToast('Error — is the API running?');
+  } finally { document.getElementById('gen-btn').disabled = false; }
+}
+
+function renderOutput(data, fmt, cat) {
+  document.getElementById('out-loading').classList.remove('active');
+  document.getElementById('out-tags').innerHTML = `
+    <span class="output-tag output-tag-client-${client}">${NAMES[client]}</span>
+    <span class="output-tag">${fmt.replace(/_/g,' ')}</span>
+    <span class="output-tag">${cat}</span>
+    <span class="output-tag">${mood}</span>`;
+  const html = data.content
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/\n/g, '<br>');
+  document.getElementById('out-text').innerHTML = html;
+  document.getElementById('out-content').classList.add('visible');
+  document.getElementById('out-placeholder').style.display = 'none';
+  document.getElementById('output-badge').style.display = 'inline-block';
+  document.getElementById('compare-btn').style.display = 'inline-block';
+}
+
+function resetOutput() {
+  document.getElementById('out-content').classList.remove('visible');
+  document.getElementById('out-placeholder').style.display = 'flex';
+  document.getElementById('out-placeholder').innerHTML = '<div class="output-placeholder-glyph">✦</div><div class="output-placeholder-text">Awaiting generation</div>';
+  document.getElementById('output-badge').style.display = 'none';
+  document.getElementById('compare-btn').style.display = 'none';
+  document.getElementById('compare-card').style.display = 'none';
+  document.getElementById('iterate-card').style.display = 'none';
+  setPipe('document');
+}
+
+function toggleIterate() {
+  const c = document.getElementById('iterate-card');
+  c.style.display = c.style.display === 'none' ? 'block' : 'none';
+  setPipe('iterate');
+}
+
+async function iterate() {
+  const fb = document.getElementById('iter-input').value.trim();
+  if (!fb) { showToast('Enter feedback first'); return; }
+  if (!lastOutput) { showToast('Generate content first'); return; }
+  document.getElementById('out-loading').classList.add('active');
+  document.getElementById('out-stage').textContent = 'Refining with your feedback...';
+  document.getElementById('out-fill').style.width = '70%';
+  try {
+    const res = await fetch(`${API}/iterate`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ client, previous_content: lastOutput, feedback: fb }) });
+    const data = await res.json();
+    lastOutput = data.content;
+    const html = data.content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/^# (.+)$/gm, '<h1>$1</h1>').replace(/^## (.+)$/gm, '<h2>$1</h2>').replace(/\n/g, '<br>');
+    document.getElementById('out-text').innerHTML = html;
+    document.getElementById('out-loading').classList.remove('active');
+    document.getElementById('iter-input').value = '';
+    showToast('Content refined ✓'); setPipe('iterate');
+  } catch { document.getElementById('out-loading').classList.remove('active'); showToast('Iterate failed — check API'); }
+}
+
+async function showCompare() {
+  document.getElementById('compare-card').style.display = 'block';
+  document.getElementById('cmp-loading').classList.add('active');
+  document.getElementById('cmp-kind').textContent = lastOutput;
+  try {
+    const res = await fetch(`${API}/compare`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ client, content_format: lastFormat, category: lastCategory, mood }) });
+    const data = await res.json();
+    document.getElementById('cmp-generic').textContent = data.generic || '';
+    document.getElementById('cmp-kind').textContent = data.kind || lastOutput;
+    document.getElementById('diff-list').innerHTML = (data.differentiation_reasons || []).map(r => `<div class="diff-item"><span>✓</span>${r}</div>`).join('');
+    document.getElementById('cmp-loading').classList.remove('active');
+    showToast('Comparison ready ✓');
+  } catch { document.getElementById('cmp-loading').classList.remove('active'); document.getElementById('cmp-generic').textContent = 'Error — is the API running?'; }
+}
+
+function copyOutput() {
+  if (!lastOutput) return;
+  navigator.clipboard.writeText(lastOutput).then(() => showToast('Copied ✓'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+updatePreview();
+</script>
+</body>
+</html>

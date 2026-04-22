@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+venv/
+ai_fashion/
+ai_fashion2/
+outputs/
+.DS_Store
