@@ -1,9 +1,5 @@
-"""
-api.py
-FastAPI server — exposes the content pipeline as REST endpoints.
-Run with: python main.py --server
-"""
-
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
